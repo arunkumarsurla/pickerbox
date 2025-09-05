@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import dice_bg from "../assets/dice_bg.png";
+import dice1 from "../assets/dice_1.png";
+import dice2 from "../assets/dice_2.png";
+import dice3 from "../assets/dice_3.png";
+import dice4 from "../assets/dice_4.png";
+import dice5 from "../assets/dice_5.png";
+import dice6 from "../assets/dice_6.png";
 
 const Dice = () => {
   const [randomNumber, setRandomNumber] = useState(6);
   const [isRolling, setIsRolling] = useState(false);
+
+  const diceImages = [dice1, dice2, dice3, dice4, dice5, dice6];
 
   const rollDice = () => {
     if (isRolling) return;
@@ -20,7 +28,7 @@ const Dice = () => {
         <img
           onClick={rollDice}
           className={isRolling ? "dice-rolling" : ""}
-          src={`/src/assets/dice_${randomNumber}.png`}
+          src={diceImages[randomNumber - 1]}
           alt={`Dice ${randomNumber}`}
         />
         <p>Click on Dice / Play Now to Roll</p>
