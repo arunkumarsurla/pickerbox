@@ -40,7 +40,14 @@ const CoinPicker = () => {
         >
           Draw Number
         </button>
-        <button className="reset-btn" onClick={resetGame}>
+        <button
+          className="reset-btn"
+          onClick={() => {
+            if (window.confirm("Are you sure you want to restart the game?")) {
+              resetGame();
+            }
+          }}
+        >
           Restart
         </button>
         <div
