@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dice_bg from "../assets/dice_bg.png";
 import dice1 from "../assets/dice_1.png";
 import dice2 from "../assets/dice_2.png";
@@ -12,6 +12,17 @@ const Dice = () => {
   const [isRolling, setIsRolling] = useState(false);
 
   const diceImages = [dice1, dice2, dice3, dice4, dice5, dice6];
+
+  // ✅ Preload all dice images in memory
+  useEffect(() => {
+    diceImages.forEach((imgSrc) => {
+      const img = new Image();
+      img.src = imgSrc;
+    });
+
+    const bg = new Image();
+    bg.src = dice_bg;
+  }, []);
 
   const rollDice = () => {
     if (isRolling) return;
