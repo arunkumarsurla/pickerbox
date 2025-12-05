@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const CoinPicker = () => {
   const sequenceNumbers = Array.from({ length: 90 }, (_, i) => i + 1);
 
-  const [availableNumbers, setAvailableNumbers] = useState([
-    ...sequenceNumbers,
-  ]);
+  const [availableNumbers, setAvailableNumbers] = useState([...sequenceNumbers]);
   const [pickedNumber, setPickedNumber] = useState(0);
-  const [previousNumber, setPreviousNumber] = useState(0);
+
+  // Store previous number without triggering re-render
+  const previousNumberRef = useRef(0);
 
   const pickNumber = () => {
     const randomIndex = Math.floor(Math.random() * availableNumbers.length);
     const number = availableNumbers[randomIndex];
 
-    // Update previous number before setting new picked number
-    setPreviousNumber(pickedNumber);
+    // Store current number into ref BEFORE updating state
+    previousNumberRef.current = pickedNumber;
+
     setPickedNumber(number);
 
     const newAvailable = [...availableNumbers];
@@ -25,13 +26,14 @@ const CoinPicker = () => {
   const resetGame = () => {
     setAvailableNumbers([...sequenceNumbers]);
     setPickedNumber(0);
-    setPreviousNumber(0);
+    previousNumberRef.current = 0; // reset ref
   };
 
   return (
     <div className="container">
       <div className="coin-drawer">
         Current Number: <div className="coin-number">{pickedNumber}</div>
+
         <button
           className="play-btn"
           onClick={pickNumber}
@@ -40,6 +42,7 @@ const CoinPicker = () => {
         >
           Draw Number
         </button>
+
         <button
           className="reset-btn"
           onClick={() => {
@@ -50,6 +53,7 @@ const CoinPicker = () => {
         >
           Restart
         </button>
+
         <div
           style={{
             display: "flex",
@@ -60,7 +64,7 @@ const CoinPicker = () => {
           }}
         >
           <span>Previous Number:</span>
-          <h1 className="previous-number">{previousNumber}</h1>
+          <h1 className="previous-number">{previousNumberRef.current}</h1>
         </div>
       </div>
 
