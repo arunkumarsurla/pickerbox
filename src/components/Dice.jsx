@@ -26,18 +26,21 @@ const Dice = () => {
     <div className="container">
       <div className="dice-container">
         <img
+          loading="eager"
           onClick={rollDice}
           className={isRolling ? "dice-rolling" : ""}
           src={diceImages[randomNumber - 1]}
           alt={`Dice ${randomNumber}`}
         />
+
         <p>Click on Dice / Play Now to Roll</p>
         <button className="play-btn" onClick={rollDice}>
           Play Now
         </button>
       </div>
+
       <div>
-        <img className="dice-bg" src={dice_bg} alt="Dice background" />
+        <img loading="lazy" className="dice-bg" src={dice_bg} alt="Dice background" />
       </div>
     </div>
   );
