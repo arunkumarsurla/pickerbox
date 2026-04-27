@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const CoinPicker = () => {
   const sequenceNumbers = Array.from({ length: 90 }, (_, i) => i + 1);
@@ -6,16 +6,29 @@ const CoinPicker = () => {
   const [availableNumbers, setAvailableNumbers] = useState([...sequenceNumbers]);
   const [pickedNumber, setPickedNumber] = useState(0);
 
-  // Store previous number without triggering re-render
   const previousNumberRef = useRef(0);
 
+  // 🔒 Confirm before page reload / tab close
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ""; // Required for browser confirmation
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   const pickNumber = () => {
+    if (availableNumbers.length === 0) return;
+
     const randomIndex = Math.floor(Math.random() * availableNumbers.length);
     const number = availableNumbers[randomIndex];
 
-    // Store current number into ref BEFORE updating state
     previousNumberRef.current = pickedNumber;
-
     setPickedNumber(number);
 
     const newAvailable = [...availableNumbers];
@@ -26,7 +39,7 @@ const CoinPicker = () => {
   const resetGame = () => {
     setAvailableNumbers([...sequenceNumbers]);
     setPickedNumber(0);
-    previousNumberRef.current = 0; // reset ref
+    previousNumberRef.current = 0;
   };
 
   return (
@@ -34,14 +47,11 @@ const CoinPicker = () => {
       <div className="coin-drawer">
         Current Number: <div className="coin-number">{pickedNumber}</div>
 
-        <button
-          className="play-btn"
-          onClick={pickNumber}
-          disabled={availableNumbers.length === 0}
-          style={{ display: availableNumbers.length === 0 ? "none" : "block" }}
-        >
-          Draw Number
-        </button>
+        {availableNumbers.length > 0 && (
+          <button className="play-btn" onClick={pickNumber}>
+            Draw Number
+          </button>
+        )}
 
         <button
           className="reset-btn"
@@ -57,7 +67,6 @@ const CoinPicker = () => {
         <div
           style={{
             display: "flex",
-            textAlign: "center",
             justifyContent: "center",
             alignItems: "center",
             gap: "10px",
