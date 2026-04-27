@@ -166,7 +166,7 @@ body {
   justify-content: center;
   text-align: center;
   font-size: 60px;
-  font-family: sans-serif;
+  font-family: Poppins;
 }
 
 .previous-number {
@@ -225,7 +225,7 @@ body {
 .coin-container {
   text-align: center;
   margin-top: 40px;
-  font-family: Poppins, sans-serif;
+  font-family: Poppins;
 }
 
 .coin {
