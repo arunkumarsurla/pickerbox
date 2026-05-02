@@ -1,152 +1,159 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-const STORAGE_KEY = "coin_picker_game_v1";
+const STORAGE_KEY = "housie_v2";
+const ALL_NUMS = Array.from({ length: 90 }, (_, i) => i + 1);
 
-const CoinPicker = () => {
-  const sequenceNumbers = Array.from({ length: 90 }, (_, i) => i + 1);
+export default function HousiePicker() {
+  const [available, setAvailable] = useState(ALL_NUMS);
+  const [current, setCurrent] = useState(null);
+  const [prev, setPrev] = useState(null);
+  const [popKey, setPopKey] = useState(0);
 
-  const [availableNumbers, setAvailableNumbers] = useState(sequenceNumbers);
-  const [pickedNumber, setPickedNumber] = useState(0);
-  const previousNumberRef = useRef(0);
-
-  // ✅ Load saved state on mount
+  // Load saved state on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return;
-
-      const parsed = JSON.parse(saved);
-
-      if (parsed && typeof parsed === "object") {
-        setAvailableNumbers(
-          Array.isArray(parsed.availableNumbers)
-            ? parsed.availableNumbers
-            : sequenceNumbers
-        );
-
-        setPickedNumber(
-          typeof parsed.pickedNumber === "number"
-            ? parsed.pickedNumber
-            : 0
-        );
-
-        previousNumberRef.current =
-          typeof parsed.previousNumber === "number"
-            ? parsed.previousNumber
-            : 0;
-      }
-    } catch (err) {
-      console.error("Error loading saved game:", err);
-    }
+      const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      if (s.available) setAvailable(s.available);
+      if (s.current) setCurrent(s.current);
+      if (s.prev) setPrev(s.prev);
+    } catch {}
   }, []);
 
-  // ✅ Persist state
+  // Persist state on change
   useEffect(() => {
-    const state = {
-      availableNumbers,
-      pickedNumber,
-      previousNumber: previousNumberRef.current,
-    };
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ available, current, prev })
+    );
+  }, [available, current, prev]);
 
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (err) {
-      console.error("Error saving game:", err);
-    }
-  }, [availableNumbers, pickedNumber]);
-
-  // 🔒 Warn before closing/reloading
+  // Warn before closing / reloading
   useEffect(() => {
-    const handleBeforeUnload = (e) => {
+    const fn = (e) => {
       e.preventDefault();
       e.returnValue = "";
     };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () =>
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", fn);
+    return () => window.removeEventListener("beforeunload", fn);
   }, []);
 
-  const pickNumber = () => {
-    if (availableNumbers.length === 0) return;
-
-    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-    const number = availableNumbers[randomIndex];
-
-    previousNumberRef.current = pickedNumber;
-    setPickedNumber(number);
-
-    const newAvailable = [...availableNumbers];
-    newAvailable.splice(randomIndex, 1);
-    setAvailableNumbers(newAvailable);
+  const draw = () => {
+    if (!available.length) return;
+    const idx = Math.floor(Math.random() * available.length);
+    const n = available[idx];
+    setPrev(current);
+    setCurrent(n);
+    setPopKey((k) => k + 1);
+    setAvailable((a) => a.filter((_, i) => i !== idx));
   };
 
-  const resetGame = () => {
-    setAvailableNumbers(sequenceNumbers);
-    setPickedNumber(0);
-    previousNumberRef.current = 0;
-
-    // ❌ Clear persisted state
+  const reset = () => {
+    if (!window.confirm("Restart the game?")) return;
+    setAvailable(ALL_NUMS);
+    setCurrent(null);
+    setPrev(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  const drawn = 90 - available.length;
+  const pct = drawn / 90;
+  const circumference = 2 * Math.PI * 90; // r = 90
+
   return (
-    <div className="container">
-      <div className="coin-drawer">
-        <div>
-          Current Number:
-          <div className="coin-number">{pickedNumber}</div>
-        </div>
+    <div className="page">
+      <div className="housie-page">
 
-        {availableNumbers.length > 0 && (
-          <button className="play-btn" onClick={pickNumber}>
-            Draw Number
-          </button>
-        )}
-
-        <button
-          className="reset-btn"
-          onClick={() => {
-            if (window.confirm("Are you sure you want to restart the game?")) {
-              resetGame();
-            }
-          }}
-        >
-          Restart
-        </button>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <span>Previous Number:</span>
-          <h1 className="previous-number">
-            {previousNumberRef.current}
-          </h1>
-        </div>
-      </div>
-
-      <div className="num-box-container">
-        {sequenceNumbers.map((number) => {
-          const isActive = !availableNumbers.includes(number);
-
-          return (
-            <div
-              key={number}
-              className={`num-box ${isActive ? "active" : ""}`}
-            >
-              {number}
+        {/* ── HEADER ── */}
+        <div className="housie-header">
+          <div>
+            <div className="label">Tambola / Housie</div>
+            <div className="housie-title">
+              NUMBER
+              <br />
+              <span>DRAW</span>
             </div>
-          );
-        })}
+          </div>
+          <div className="housie-stats">
+            <div className="stat-box">
+              <div className="stat-val">{drawn}</div>
+              <div className="stat-lbl">Drawn</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-val">{available.length}</div>
+              <div className="stat-lbl">Remaining</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── MAIN ── */}
+        <div className="housie-main">
+
+          {/* Draw panel */}
+          <div className="housie-draw-panel">
+            <div className="current-number-ring">
+              <svg viewBox="0 0 200 200">
+                <circle className="ring-track" cx="100" cy="100" r="90" />
+                <circle
+                  className="ring-progress"
+                  cx="100" cy="100" r="90"
+                  style={{ strokeDashoffset: circumference * (1 - pct) }}
+                />
+              </svg>
+              <div className="num-display">
+                <div className="label" style={{ textAlign: "center", marginBottom: 4 }}>
+                  CURRENT
+                </div>
+                <span key={popKey} className="big-num num-pop">
+                  {current ?? "—"}
+                </span>
+              </div>
+            </div>
+
+            <div className="prev-row">
+              <div className="label" style={{ marginBottom: 0 }}>PREV</div>
+              <div className="prev-badge">{prev ?? "—"}</div>
+            </div>
+
+            <div className="housie-actions">
+              {available.length > 0 ? (
+                <button className="btn-gold" onClick={draw}>
+                  DRAW NUMBER
+                </button>
+              ) : (
+                <div className="all-done-banner">FULL HOUSE!</div>
+              )}
+              <button className="btn-red" onClick={reset}>
+                RESTART
+              </button>
+            </div>
+          </div>
+
+          {/* Number grid */}
+          <div className="housie-grid-wrap">
+            <div className="label" style={{ marginBottom: 12 }}>
+              ALL NUMBERS
+            </div>
+            <div className="housie-grid">
+              {ALL_NUMS.map((n) => (
+                <div
+                  key={n}
+                  className={`hbox ${
+                    n === current
+                      ? "current"
+                      : !available.includes(n)
+                      ? "drawn"
+                      : ""
+                  }`}
+                >
+                  {n}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
-};
+}
 
-export default CoinPicker;
