@@ -1,56 +1,38 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Dice from "./components/Dice";
-import CoinPicker from "./components/CoinPicker";
 import FlipCoin from "./components/FlipCoin";
+import HousiePicker from "./components/HousiePicker";
+import "./styles.css";
 
-function App() {
-  const [activeView, setActiveView] = useState("dice"); 
+const VIEWS = [
+  { id: "dice",   label: "Roll Dice" },
+  { id: "housie", label: "Housie"    },
+  { id: "coin",   label: "Toss Coin" },
+];
 
-  const Header = () => {
-    return (
-      <nav className="header">
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setActiveView("dice");
-          }}
-          className={activeView === "dice" ? "active" : ""}
-        >
-          Roll the Dice
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setActiveView("housie");
-          }}
-          className={activeView === "housie" ? "active" : ""}
-        >
-          Housie Picker
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setActiveView("coin");
-          }}
-          className={activeView === "coin" ? "active" : ""}
-        >
-          Toss Coin
-        </a>
-      </nav>
-    );
-  };
+export default function App() {
+  const [view, setView] = useState("dice");
 
   return (
     <>
-      <Header />
-      {activeView === "dice" && <Dice />}
-      {activeView === "housie" && <CoinPicker />}
-      {activeView === "coin" && <FlipCoin />}
+      <nav className="app-nav">
+        {VIEWS.map(({ id, label }) => (
+          <button
+            key={id}
+            className={`nav-btn ${view === id ? "active" : ""}`}
+            onClick={() => setView(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      {/* key forces re-mount + fadeUp animation on tab switch */}
+      <div key={view}>
+        {view === "dice"   && <Dice />}
+        {view === "housie" && <HousiePicker />}
+        {view === "coin"   && <FlipCoin />}
+      </div>
     </>
   );
 }
-
-export default App;
