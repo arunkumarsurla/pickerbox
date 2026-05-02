@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Dice from "./components/Dice";
 import FlipCoin from "./components/FlipCoin";
-import HousiePicker from "./components/HousiePicker";
+import CoinPicker from "./components/CoinPicker";
 import "./styles.css";
 
 const VIEWS = [
@@ -30,7 +30,7 @@ export default function App() {
       {/* key forces re-mount + fadeUp animation on tab switch */}
       <div key={view}>
         {view === "dice"   && <Dice />}
-        {view === "housie" && <HousiePicker />}
+        {view === "housie" && <CoinPicker />}
         {view === "coin"   && <FlipCoin />}
       </div>
     </>
