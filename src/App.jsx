@@ -2,7 +2,7 @@ import { useState } from "react";
 import Dice from "./components/Dice";
 import FlipCoin from "./components/FlipCoin";
 import CoinPicker from "./components/CoinPicker";
-import "./styles.css";
+import "./index.css";
 
 const VIEWS = [
   { id: "dice",   label: "Roll Dice" },
