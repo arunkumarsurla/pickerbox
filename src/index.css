@@ -609,12 +609,13 @@ body::before {
   .dice-face { width: 130px; height: 130px; }
   .dice-result-num { font-size: 72px; }
 }
+  
+.num-box {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f0f0f0;
   font-family: sans-serif;
 }
-
 .num-box.active {
   background-color: black;
   color: white;
