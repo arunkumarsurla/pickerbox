@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 const STORAGE_KEY = "housie_v2";
 const ALL_NUMS = Array.from({ length: 90 }, (_, i) => i + 1);
 
-export default function HousiePicker() {
+export default function CoinPicker() {
   const [available, setAvailable] = useState(ALL_NUMS);
   const [current, setCurrent] = useState(null);
   const [prev, setPrev] = useState(null);
