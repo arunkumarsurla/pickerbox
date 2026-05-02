@@ -1,53 +1,54 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 export default function FlipCoin() {
   const [result, setResult] = useState("HEADS");
-  const [isFlipping, setIsFlipping] = useState(false);
-
+  const [flipping, setFlipping] = useState(false);
   const coinRef = useRef(null);
 
-  const flipCoin = () => {
-    if (isFlipping) return;
+  const flip = () => {
+    if (flipping) return;
+    setFlipping(true);
 
-    setIsFlipping(true);
-
-    const outcomes = ["HEADS", "TAILS"];
-    const finalResult = outcomes[Math.floor(Math.random() * 2)];
-
-    // 1) Add spin animation
-    coinRef.current.classList.add("flip-spin");
+    const el = coinRef.current;
+    el.classList.remove("coin-spinning");
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add("coin-spinning");
 
     setTimeout(() => {
-      // 2) Stop spin animation
-      coinRef.current.classList.remove("flip-spin");
-
-      // 3) Apply final rotation to show correct side
-      if (finalResult === "HEADS") {
-        coinRef.current.style.transform = "rotateY(0deg)";
-      } else {
-        coinRef.current.style.transform = "rotateY(180deg)";
-      }
-
-      setResult(finalResult);
-      setIsFlipping(false);
-    }, 1200); // matches animation
+      const outcome = Math.random() < 0.5 ? "HEADS" : "TAILS";
+      el.style.transform = outcome === "TAILS" ? "rotateY(180deg)" : "rotateY(0deg)";
+      setResult(outcome);
+      setFlipping(false);
+    }, 1200);
   };
 
   return (
-    <div className="coin-container">
-      <h1>Flip A Coin</h1>
-      <p>Click the button to flip and get a random result!</p>
+    <div className="page">
+      <div className="coin-page">
+        <h1 className="coin-headline">
+          The <em>Toss</em>
+        </h1>
+        <div className="coin-subtitle">Let fate decide — heads or tails</div>
 
-      <div className="coin" ref={coinRef}>
-        <div className="coin-face front">HEADS</div>
-        <div className="coin-face back">TAILS</div>
+        <div
+          className="coin-3d"
+          ref={coinRef}
+          onClick={flip}
+          style={{ perspectiveOrigin: "center" }}
+        >
+          <div className="coin-face-3d heads">HEADS</div>
+          <div className="coin-face-3d tails">TAILS</div>
+        </div>
+
+        <div className="coin-result-badge">{result}</div>
+
+        <button className="btn-gold" onClick={flip} disabled={flipping}>
+          {flipping ? "FLIPPING..." : "FLIP COIN"}
+        </button>
+        <div className="dice-hint" style={{ marginTop: 12 }}>
+          — or click the coin —
+        </div>
       </div>
-
-      <h2 className="result-text">{result}</h2>
-
-      <button className="play-btn" disabled={isFlipping} onClick={flipCoin}>
-        {isFlipping ? "Flipping..." : "Flip Coin"}
-      </button>
     </div>
   );
 }
