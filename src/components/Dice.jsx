@@ -1,60 +1,63 @@
-import React, { useState, useEffect } from "react";
-import dice_bg from "../assets/dice_bg.png";
-import dice1 from "../assets/dice_1.png";
-import dice2 from "../assets/dice_2.png";
-import dice3 from "../assets/dice_3.png";
-import dice4 from "../assets/dice_4.png";
-import dice5 from "../assets/dice_5.png";
-import dice6 from "../assets/dice_6.png";
+import { useState, useRef } from "react";
 
-const Dice = () => {
-  const [randomNumber, setRandomNumber] = useState(6);
-  const [isRolling, setIsRolling] = useState(false);
+const DOT_LAYOUTS = {
+  1: [[false, false, false], [false, true,  false], [false, false, false]],
+  2: [[true,  false, false], [false, false, false], [false, false, true ]],
+  3: [[true,  false, false], [false, true,  false], [false, false, true ]],
+  4: [[true,  false, true ], [false, false, false], [true,  false, true ]],
+  5: [[true,  false, true ], [false, true,  false], [true,  false, true ]],
+  6: [[true,  false, true ], [true,  false, true ], [true,  false, true ]],
+};
 
-  const diceImages = [dice1, dice2, dice3, dice4, dice5, dice6];
+export default function Dice() {
+  const [num, setNum] = useState(1);
+  const [rolling, setRolling] = useState(false);
+  const ref = useRef(null);
 
-  // ✅ Preload all dice images in memory
-  useEffect(() => {
-    diceImages.forEach((imgSrc) => {
-      const img = new Image();
-      img.src = imgSrc;
-    });
+  const roll = () => {
+    if (rolling) return;
+    setRolling(true);
 
-    const bg = new Image();
-    bg.src = dice_bg;
-  }, []);
+    const el = ref.current;
+    el.classList.remove("dice-rolling");
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add("dice-rolling");
 
-  const rollDice = () => {
-    if (isRolling) return;
-    setIsRolling(true);
     setTimeout(() => {
-      setRandomNumber(Math.floor(Math.random() * 6) + 1);
-      setIsRolling(false);
+      setNum(Math.floor(Math.random() * 6) + 1);
+      setRolling(false);
     }, 800);
   };
 
+  const layout = DOT_LAYOUTS[num];
+
   return (
-    <div className="container">
-      <div className="dice-container">
-        <img
-          loading="eager"
-          onClick={rollDice}
-          className={isRolling ? "dice-rolling" : ""}
-          src={diceImages[randomNumber - 1]}
-          alt={`Dice ${randomNumber}`}
-        />
+    <div className="page">
+      <div className="dice-page">
+        <div className="dice-headline">
+          ROLL <span>THE</span>
+          <br />
+          DICE
+        </div>
+        <div className="dice-subtitle">Fortune favors the bold — take your chance</div>
 
-        <p>Click on Dice / Play Now to Roll</p>
-        <button className="play-btn" onClick={rollDice}>
-          Play Now
-        </button>
-      </div>
+        <div className="dice-layout">
+          <div ref={ref} className="dice-face" onClick={roll}>
+            {layout.flat().map((on, i) => (
+              <div key={i} className={`dot ${on ? "" : "hidden"}`} />
+            ))}
+          </div>
 
-      <div>
-        <img loading="lazy" className="dice-bg" src={dice_bg} alt="Dice background" />
+          <div className="dice-result-num">{num}</div>
+        </div>
+
+        <div className="dice-actions">
+          <button className="btn-gold" onClick={roll} disabled={rolling}>
+            {rolling ? "ROLLING..." : "ROLL DICE"}
+          </button>
+          <div className="dice-hint">— or click the dice —</div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Dice;
+}
