@@ -27,16 +27,6 @@ export default function CoinPicker() {
     );
   }, [available, current, prev]);
 
-  // Warn before closing / reloading
-  useEffect(() => {
-    const fn = (e) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", fn);
-    return () => window.removeEventListener("beforeunload", fn);
-  }, []);
-
   const draw = () => {
     if (!available.length) return;
     const idx = Math.floor(Math.random() * available.length);
