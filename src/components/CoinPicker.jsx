@@ -56,11 +56,9 @@ export default function CoinPicker() {
         {/* ── HEADER ── */}
         <div className="housie-header">
           <div>
-            <div className="label">Tambola / Housie</div>
             <div className="housie-title">
               NUMBER
-              <br />
-              <span>DRAW</span>
+              <span> DRAW</span>
             </div>
           </div>
           <div className="housie-stats">
