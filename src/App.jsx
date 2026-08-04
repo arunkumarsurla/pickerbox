@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Dice from "./components/Dice";
 import FlipCoin from "./components/FlipCoin";
 import CoinPicker from "./components/CoinPicker";
 import "./index.css";
 
 const VIEWS = [
-  { id: "dice",   label: "Roll Dice" },
-  { id: "housie", label: "Housie"    },
-  { id: "coin",   label: "Toss Coin" },
+  { id: "dice", label: "Roll Dice" },
+  { id: "housie", label: "Housie" },
+  { id: "coin", label: "Toss Coin" },
 ];
 
 export default function App() {
-  const [view, setView] = useState("dice");
+  const [view, setView] = useState(() => {
+    return localStorage.getItem("lastView") || "dice";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("lastView", view);
+  }, [view]);
 
   return (
     <>
@@ -29,9 +35,9 @@ export default function App() {
 
       {/* key forces re-mount + fadeUp animation on tab switch */}
       <div key={view}>
-        {view === "dice"   && <Dice />}
+        {view === "dice" && <Dice />}
         {view === "housie" && <CoinPicker />}
-        {view === "coin"   && <FlipCoin />}
+        {view === "coin" && <FlipCoin />}
       </div>
     </>
   );
