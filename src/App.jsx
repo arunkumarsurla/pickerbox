@@ -15,7 +15,6 @@ export default function App() {
     return localStorage.getItem("lastView") || "dice";
   });
   const [navVisible, setNavVisible] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -29,10 +28,9 @@ export default function App() {
       if (currentY <= 10) {
         setNavVisible(true);
       } else if (currentY > lastScrollY.current) {
-        setNavVisible(false);
-        setMenuOpen(false);
+        setNavVisible(false); // scrolling down
       } else {
-        setNavVisible(true);
+        setNavVisible(true); // scrolling up
       }
 
       lastScrollY.current = currentY;
@@ -41,11 +39,6 @@ export default function App() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleSelect = (id) => {
-    setView(id);
-    setMenuOpen(false);
-  };
 
   return (
     <>
@@ -62,55 +55,14 @@ export default function App() {
           opacity: 0;
           pointer-events: none;
         }
-
-        .hamburger-btn {
-          position: fixed;
-          top: 12px;
-          right: 12px;
-          z-index: 200;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          gap: 5px;
-          background: #222;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-        }
-
-        .hamburger-btn span {
-          width: 20px;
-          height: 2px;
-          background: #fff;
-          border-radius: 2px;
-        }
-
-        .menu-open.app-nav {
-          transform: translateY(0);
-          opacity: 1;
-          pointer-events: auto;
-        }
       `}</style>
 
-      <button
-        className="hamburger-btn"
-        onClick={() => setMenuOpen((prev) => !prev)}
-        aria-label="Toggle menu"
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-
-      <nav className={`app-nav ${navVisible || menuOpen ? "" : "nav-hidden"} ${menuOpen ? "menu-open" : ""}`}>
+      <nav className={`app-nav ${navVisible ? "" : "nav-hidden"}`}>
         {VIEWS.map(({ id, label }) => (
           <button
             key={id}
             className={`nav-btn ${view === id ? "active" : ""}`}
-            onClick={() => handleSelect(id)}
+            onClick={() => setView(id)}
           >
             {label}
           </button>
