@@ -16,13 +16,26 @@ export default function App() {
   });
   const [navVisible, setNavVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const hideTimer = useRef(null);
 
   useEffect(() => {
     localStorage.setItem("lastView", view);
   }, [view]);
 
+  // Auto-hide nav 3 seconds after mount
+  useEffect(() => {
+    hideTimer.current = setTimeout(() => {
+      setNavVisible(false);
+    }, 3000);
+
+    return () => clearTimeout(hideTimer.current);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
+      // any scroll cancels the auto-hide timer
+      clearTimeout(hideTimer.current);
+
       const currentY = window.scrollY;
 
       if (currentY <= 10) {
@@ -55,6 +68,11 @@ export default function App() {
           opacity: 0;
           pointer-events: none;
         }
+
+        .full-screen-content {
+          min-height: 100vh;
+          width: 100%;
+        }
       `}</style>
 
       <nav className={`app-nav ${navVisible ? "" : "nav-hidden"}`}>
@@ -69,7 +87,7 @@ export default function App() {
         ))}
       </nav>
 
-      <div key={view}>
+      <div key={view} className="full-screen-content">
         {view === "dice" && <Dice />}
         {view === "housie" && <CoinPicker />}
         {view === "coin" && <FlipCoin />}
